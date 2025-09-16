@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lua Obfuscator</title>
+</head>
+<body>
+  <h1>Upload Lua Script</h1>
+  <form action="/upload" method="GET">
+    <label>Filename:</label><br>
+    <input type="text" name="filename" placeholder="script.lua" required><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" name="password" placeholder="Set a password" required><br><br>
+
+    <label>Lua Code:</label><br>
+    <textarea name="code" rows="10" cols="60" placeholder="print('Hello World')" required></textarea><br><br>
+
+    <button type="submit">Upload & Obfuscate</button>
+  </form>
+</body>
+</html>

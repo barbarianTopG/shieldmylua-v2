@@ -1,0 +1,15 @@
+{
+  "name": "lua-obfuscator",
+  "version": "1.0.0",
+  "description": "Simple Lua obfuscator server using Node 22 and query parameters",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "author": "archie",
+  "license": "MIT"
+}
