@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Serverside Control Panel</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600;700&display=swap');
+:root{--bg-color:#07060f;--surface-color:#100e1c;--primary-accent:#946de4;--primary-accent-dark:#6b40c7;--border-color:#26243f;--text-primary:#f0f0f0;--text-secondary:#9a98ad;--font-body:'Inter',sans-serif;--font-heading:'Poppins',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background-color:var(--bg-color);color:var(--text-secondary);line-height:1.6;position:relative;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:absolute;top:-50px;left:-50px;width:400px;height:400px;background:radial-gradient(circle,rgba(141,87,255,0.15) 0%,rgba(141,87,255,0)70%);z-index:-1;animation:pulse 8s ease-in-out infinite alternate}
+body::after{content:"";position:absolute;bottom:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(107,64,199,0.1)0%,rgba(107,64,199,0)70%);z-index:-1;animation:pulse 10s ease-in-out infinite alternate-reverse}
+@keyframes pulse{from{transform:scale(0.8);opacity:0.7}to{transform:scale(1.2);opacity:1}}
+header{padding:2.5rem 1rem;text-align:center;font-family:var(--font-heading);font-size:2.5rem;font-weight:700;color:var(--text-primary);text-shadow:0 0 15px rgba(148,109,228,0.5);background:none;border:none}
+nav{display:flex;justify-content:center;gap:1rem;padding:0 2rem 2rem 2rem;background:none}
+nav button{flex:0;padding:0.75rem 2rem;background:rgba(255,255,255,0.02);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:50px;cursor:pointer;font-size:1rem;font-weight:500;transition:all 0.3s ease}
+nav button:hover{color:var(--text-primary);border-color:var(--primary-accent);background:rgba(148,109,228,0.1)}
+nav button.active{color:white;background:linear-gradient(180deg,var(--primary-accent)0%,var(--primary-accent-dark)100%);border:1px solid transparent;box-shadow:0 4px 20px -4px rgba(141,87,255,0.6)}
+main{max-width:800px;margin:0 auto;padding:0 1rem 2rem 1rem}
+#serversTab,#executorTab{display:none;padding:2rem;border-radius:16px;background:linear-gradient(180deg,rgba(23,21,43,0.8)0%,rgba(12,11,23,0.7)100%) padding-box,linear-gradient(to bottom,#222130,#0e0b1b) border-box;border:1px solid transparent;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+h2{font-family:var(--font-heading);color:var(--text-primary);font-size:1.75rem;margin-bottom:1.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border-color)}
+.server-card{background:var(--surface-color);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:1.5rem;transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease}
+.server-card:hover{transform:translateY(-5px);box-shadow:0 10px 30px rgba(0,0,0,0.3);border-color:var(--primary-accent)}
+.server-card img{border-radius:8px;width:80px;height:80px;object-fit:cover;flex-shrink:0}
+.server-card div b{color:var(--text-primary);font-weight:500}
+#executorTab{display:none;flex-direction:column;gap:1.5rem}
+textarea,input{width:100%;padding:1rem;border:1px solid var(--border-color);border-radius:8px;font-size:1rem;font-family:'Courier New',Courier,monospace;background:var(--surface-color);color:var(--text-primary);transition:all 0.3s ease}
+textarea:focus,input:focus{outline:none;border-color:var(--primary-accent);box-shadow:0 0 0 4px rgba(141,87,255,0.2)}
+textarea{min-height:200px;resize:vertical}
+button.execute-btn{padding:1rem;font-size:1.1rem;font-weight:bold;font-family:var(--font-heading);border:1px solid transparent;border-radius:50px;background:linear-gradient(180deg,var(--primary-accent)0%,var(--primary-accent-dark)100%);color:white;cursor:pointer;transition:all 0.3s ease;box-shadow:0 8px 24px -4px rgba(141,87,255,0.5)}
+button.execute-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px -4px rgba(141,87,255,0.6);filter:brightness(1.1)}
+</style>
+</head>
+<body>
+<header>⚡ Vaxarella Serverside Executor</header>
+<nav>
+    <button id="executorTabBtn" class="active">Executor</button>
+    <button id="serversTabBtn">Servers</button>
+</nav>
+<main>
+    <div id="executorTab">
+        <h2>Executor</h2>
+        <textarea id="script" placeholder="Enter script here"></textarea>
+        <input id="username" placeholder="Username">
+        <button class="execute-btn" id="send">🚀 Execute</button>
+    </div>
+    <div id="serversTab">
+        <h2>Active Servers</h2>
+        <div id="servers">Loading...</div>
+    </div>
+</main>
+
+<script>
+const serversTabBtn = document.getElementById("serversTabBtn")
+const executorTabBtn = document.getElementById("executorTabBtn")
+const serversTab = document.getElementById("serversTab")
+const executorTab = document.getElementById("executorTab")
+function showTab(tab){
+  if(tab==="servers"){serversTab.style.display="block";executorTab.style.display="none"}
+  else{serversTab.style.display="none";executorTab.style.display="flex"}
+  serversTabBtn.classList.toggle("active",tab==="servers")
+  executorTabBtn.classList.toggle("active",tab==="executor")
+}
+serversTabBtn.onclick=()=>showTab("servers")
+executorTabBtn.onclick=()=>showTab("executor")
+showTab("executor")
+async function loadServers(){
+  try{
+    const res=await fetch("/servers")
+    if(!res.ok)throw new Error("Failed to fetch servers")
+    const data=await res.json()
+    const container=document.getElementById("servers")
+    container.innerHTML=""
+    if(!data.servers||data.servers.length===0){container.innerHTML="<p>No active servers found.</p>";return}
+    for(const s of data.servers){
+      let thumbUrl=""
+      try{
+        const thumbRes=await fetch(`https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${s.placeId}&size=150x150&format=Png&isCircular=false`)
+        const thumbData=await thumbRes.json()
+        thumbUrl=thumbData.data&&thumbData.data[0]&&thumbData.data[0].imageUrl?thumbData.data[0].imageUrl:""
+      }catch{thumbUrl=""}
+      const div=document.createElement("div")
+      div.className="server-card"
+      div.innerHTML=`
+        <img src="${thumbUrl||'https://via.placeholder.com/80x80?text=No+Image'}" alt="Game Thumbnail">
+        <div>
+            <b>Place ID:</b> ${s.placeId}<br>
+            <b>Job ID:</b> ${s.jobId}<br>
+            <b>Players:</b> ${s.players? s.players.length:0}
+        </div>
+      `
+      container.appendChild(div)
+    }
+  }catch(err){
+    document.getElementById("servers").innerHTML=`<p style="color:red;">Error loading servers: ${err.message}</p>`
+  }
+}
+async function sendScript(){
+  const username=document.getElementById("username").value.trim()
+  const code=document.getElementById("script").value.trim()
+  if(!code){alert("Please enter a script.");return}
+  try{
+    const res=await fetch("/setInstructions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,code})})
+    if(!res.ok)throw new Error("Failed to send script")
+    const data=await res.json()
+    alert(`✅ Injected to ${data.serversUpdated} servers`)
+  }catch(err){
+    alert(`❌ Error: ${err.message}`)
+  }
+}
+document.getElementById("send").onclick=sendScript
+setInterval(loadServers,5000)
+loadServers()
+</script>
+</body>
+</html>

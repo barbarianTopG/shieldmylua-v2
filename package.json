@@ -1,15 +1,14 @@
 {
-  "name": "lua-obfuscator",
+  "name": "node22-server",
   "version": "1.0.0",
-  "description": "Simple Lua obfuscator server using Node 22 and query parameters",
+  "description": "plain node 22 http server with handlers",
   "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js",
+    "dev": "node --watch index.js"
   },
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "author": "archie",
+  "keywords": [],
+  "author": "ronver the menace",
   "license": "MIT"
 }
